@@ -1,0 +1,388 @@
+/* Reset & Base */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  position: fixed;
+}
+
+:root {
+  --golden-ratio: 1;
+  --video-height: 18.2vh;  /* 100% / (1 + golden-ratio) */
+  --card-height: 81.8vh;   /* video-height * golden-ratio */
+}
+
+/* 1. Slideshow Container */
+#slideshow-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%; /* Increased from 42.5% */
+  height: 70%; /* Increased from 42.5% */
+  margin: 28.75vh auto;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  background: transparent;
+  z-index: 997;
+}
+
+/* 2. Card Animation */
+#cardAnimation {
+  width: 140%;
+  height: auto;
+  position: absolute;
+  top: 25%; /* Changed from 35% to move up further */
+  left: 50%;
+  transform: translate(-50%, -50%) scale(1.26);
+  object-fit: contain;
+  z-index: 997; /* Ensure it stays above logo */
+}
+
+/* Card Front */
+#cardFront {
+  position: fixed;
+  top: 65%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.15);
+  width: auto;
+  height: 110%;
+  object-fit: contain;
+  z-index: 998;
+  opacity: 0;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+}
+
+@media (max-width: 768px) {
+  #cardFront {
+    transform: translate(-50%, -50%) scale(0.15); /* Match desktop scale */
+  }
+}
+
+/* Update media query for mobile */
+@media (max-width: 768px) {
+  #cardAnimation {
+    width: 140%;
+    height: auto;
+    top: 50%; /* Changed from 60% to move up proportionally */
+    transform: translate(-50%, -50%) scale(0.735);
+  }
+}
+
+/* 3. Overlay Box */
+#cardOverlay {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000; /* Ensure overlay stays on top */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 45%;
+  max-width: 180px;
+  padding: 0.8rem 1rem;
+  gap: 0.5rem; /* Adds consistent spacing between elements */
+  backdrop-filter: blur(8px);
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hidden {
+  display: none;
+}
+
+#cardOverlay.hidden {
+  display: flex !important;
+  opacity: 1 !important;
+}
+
+#cardOverlay:not(.hidden) {
+  transform: scale(1) translateY(0);
+}
+
+/* Overlay Content */
+#cardOverlay p#cardHeader {
+  font-size: clamp(0.5rem, 2vw, 1rem);
+  margin-bottom: 0.8rem;
+  color: #111;
+  font-weight: 500;
+  letter-spacing: -0.3px;
+  opacity: 0;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#cardOverlay img#cardLogo {
+  max-height: clamp(15px, 8vw, 50px);
+  margin-bottom: 1.5rem;
+  opacity: 0;
+  transition: opacity 4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#cardLogo {
+  width: auto;
+  height: 8.5vh; /* Reduced size */
+  margin-bottom: 0.5rem;
+  object-fit: contain;
+}
+
+#cardOverlay p#cardText {
+  font-size: clamp(0.2rem, 0.8vw, 0.4rem);
+  line-height: 1;
+  font-weight: 400;
+  text-align: center;
+  color: #333;
+  margin: 0;
+  white-space: pre-line;
+  opacity: 0;
+  transition: opacity 4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Add responsive adjustments */
+@media (max-width: 360px) {
+  #cardOverlay {
+    width: 40%; /* Reduced from 45% */
+    max-width: 162px; /* Reduced from 180px */
+  }
+  #cardOverlay p#cardText {
+    font-size: clamp(0.3rem, 1vw, 0.5rem);
+    max-width: 55%;
+  }
+  #cardOverlay p#cardHeader {
+    font-size: clamp(0.5rem, 2vw, 1rem);
+  }
+}
+
+@media (max-width: 768px) {
+  #logoAnimation {
+    width: 100%;
+    height: 12%;
+    top: 25%; /* Changed from 35% to move up 10% */
+    transform: translate(-50%, -50%) scale(3.888); /* Updated to match new size */
+  }
+}
+
+@media (min-width: 768px) {
+  #cardOverlay p#cardText {
+    font-size: clamp(1rem, 3.5vw, 1.6rem);
+    line-height: 1.3;
+  }
+}
+
+@media (min-width: 1024px) {
+  #cardAnimation, #cardFront {
+    top: 65%;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  #logoAnimation {
+    top: 22%; /* Changed from 32% to move up 10% */
+    transform: translate(-50%, -50%) scale(3.888); /* Updated to match new size */
+  }
+  
+  #claimBtn {
+    font-size: 1.2rem;
+    padding: 14px 32px;
+  }
+  #cardAnimation {
+    width: 110%;
+    height: 110%;
+    max-width: 1250px; /* Increased from 1000px to maintain proportion */
+  }
+}
+
+/* 4. Claim Now Button */
+#claimBtn {
+  position: fixed;
+  bottom: 15%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 12px 28px;
+  background-color: #00704A;
+  color: white;
+  border: none;
+  border-radius: 24px;
+  font-size: 1.1rem;
+  font-weight: 500;
+  cursor: pointer;
+  opacity: 0;
+  transition: all 0.3s ease-out;
+  z-index: 1000;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+#claimBtn:not(.hidden) {
+  display: block;
+}
+
+#claimBtn:hover {
+  transform: translateX(-50%) scale(1.05);
+  background-color: #005c3b;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+#claimBtn:active {
+  transform: translateX(-50%) scale(0.95);
+}
+
+/* 5. Tablet & Up */
+@media (min-width: 480px) {
+  #cardOverlay {
+    width: 67.5%; /* Reduced from 75% */
+  }
+}
+
+@media (min-width: 600px) {
+  #slideshow-container {
+    max-width: 500px;    /* don’t let it grow too wide */
+  }
+}
+
+/* ---------------------------------------------
+   DESKTOP: show the full card (no more crop)
+   --------------------------------------------- */
+@media (min-width: 1024px) {
+  #slideshow-container {
+    top: var(--video-height);
+    height: var(--card-height);
+    max-width: 600px;
+    margin: 0 auto;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+/* 0) Top video styling */
+#topVideo {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: var(--video-height);
+  object-fit: cover;
+  object-position: center 50%; /* Moved down slightly to crop more from top */
+  transform: scale(1); /* Increased scale to crop more from top/bottom */
+  z-index: 999;
+  opacity: 1 !important;
+}
+
+/* Loading Overlay */
+#loadingOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #fff 0%, #f8f8f8 100%);
+  z-index: 1000; /* Keep loading overlay on top */
+  transition: opacity 0.5s ease-out;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 3px solid #f3f3f3;
+  border-radius: 50%;
+  animation: spin 4s linear infinite;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.progress-text {
+  font-size: 1.2rem;
+  color: #333;
+  margin-top: 1rem;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+    border-top-color: #FFD700; /* Yellow */
+  }
+  25% {
+    transform: rotate(90deg);
+    border-top-color: #FF0000; /* Red */
+  }
+  50% {
+    transform: rotate(180deg);
+    border-top-color: #00FF00; /* Green */
+  }
+  75% {
+    transform: rotate(270deg);
+    border-top-color: #007bff; /* Blue */
+  }
+  100% {
+    transform: rotate(360deg);
+    border-top-color: #FFD700; /* Back to Yellow */
+  }
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.4;
+    transform: scale(0.98);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0.4;
+    transform: scale(0.98);
+  }
+}
+
+@keyframes floatIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+/* Logo Animation */
+#logoAnimation {
+  position: fixed;
+  top: 22%; /* Changed from 32% to move up 10% */
+  left: 50%;
+  transform: translate(-50%, -50%) scale(3.888);
+  width: 100%;
+  height: 12%;
+  object-fit: contain;
+  z-index: 996;
+  pointer-events: none;
+  overflow: hidden;
+  clip-path: inset(0 0 15% 0);
+  transition: transform 0.3s ease-out;
+}
+
+/* Ensure proper stacking order */
+#cardOverlay, #claimBtn {
+  z-index: 1000;
+}
+
+@media (hover: hover) {
+  #cardAnimation:hover {
+    transform: translate(-50%, -50%) scale(1.02);
+  }
+  
+  #cardOverlay:hover {
+    transform: scale(1.02);
+  }
+}

@@ -1,0 +1,41 @@
+<!-- public/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, viewport-fit=cover, user-scalable=no, maximum-scale=1.0">
+  <title>Card + Overlay</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Logo Animation -->
+  <video
+    id="logoAnimation"
+    src="assets/videos/Animetion Logo.mp4"
+    muted 
+    playsinline
+    type="video/mp4"
+  ></video>
+
+  <!-- Main Content -->
+  <div id="slideshow-container">
+    <video id="cardAnimation" muted playsinline>
+      <source src="assets/videos/Comp 1.mp4" type="video/mp4">
+    </video>
+
+    <!-- 2) Your overlay (logo + text) -->
+    <div id="cardOverlay" class="hidden">
+      <img id="cardLogo" src="assets/images/logo.png" alt="Logo" />
+      <p id="cardHeader">Starbucks</p>
+      <div id="cardText">
+        Free Coffee<br>for a Year
+      </div>
+    </div>
+
+    <!-- 3) Claim button (must be *inside* the relative container) -->
+    <button id="claimBtn" class="hidden">Claim Now</button>
+  </div>
+  <!-- 3) Your bundled JS -->
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>
