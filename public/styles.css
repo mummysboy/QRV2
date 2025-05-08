@@ -117,7 +117,7 @@ html, body {
 #cardOverlay p#cardText {
   opacity: 0;
   transition: opacity 20s cubic-bezier(0.22, 0.61, 0.36, 1);
-  transition-delay: 6s;  /* Increased delay for smoother effect */
+  transition-delay: 10s;  /* Increased from 8s to 10s for later fade-in */
 }
 
 #cardOverlay.visible p#cardHeader,
@@ -252,6 +252,7 @@ html, body {
   visibility: hidden;
   transition: opacity 20s cubic-bezier(0.22, 0.61, 0.36, 1),
               transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition-delay: 10s;  /* Increased from 8s to 10s to match other elements */
   z-index: 1000;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
