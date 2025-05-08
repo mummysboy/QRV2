@@ -178,7 +178,9 @@ async function init() {
       if (claimBtn) {
         claimBtn.classList.remove('hidden');
         claimBtn.style.visibility = 'visible';
+        
         requestAnimationFrame(() => {
+          claimBtn.style.transition = 'opacity 4s cubic-bezier(0.22, 0.61, 0.36, 1)';
           claimBtn.style.opacity = '1';
         });
       }
@@ -187,34 +189,46 @@ async function init() {
     const videoDuration = mainVideo.duration;
     const overlayStartTime = videoDuration - (CONFIG.overlayAnimation.overlayOffset * 1.08);
 
-    // Update existing timeupdate listener
+    // Update the timeupdate listener
     mainVideo.addEventListener('timeupdate', () => {
       if (mainVideo.currentTime >= overlayStartTime && overlay.classList.contains('hidden')) {
-        // Show all elements except button
-        [overlay, cardFront, textEl, headerEl, logoEl].forEach(el => {
-          if (el) {
-            el.classList.remove('hidden');
-            el.style.visibility = 'visible';
-          }
-        });
+        overlay.classList.remove('hidden');
         
         requestAnimationFrame(() => {
-          const fadeConfig = `opacity ${CONFIG.overlayAnimation.fadeInDuration}s ${CONFIG.overlayAnimation.fadeInEasing}`;
+          // Set initial position
+          overlay.style.position = 'fixed';
+          overlay.style.top = '50%';
+          overlay.style.left = '50%';
+          overlay.style.transform = 'translate(-50%, -50%)';
           
-          [overlay, cardFront, textEl, headerEl, logoEl].forEach(el => {
+          const smoothConfig = {
+            background: `background-color 4s cubic-bezier(0.22, 0.61, 0.36, 1)`,
+            opacity: `opacity 4s cubic-bezier(0.22, 0.61, 0.36, 1)`
+          };
+          
+          // Apply transitions without transform
+          overlay.style.transition = Object.values(smoothConfig).join(', ');
+          overlay.style.backgroundColor = 'rgba(255, 255, 255, 0)';
+          
+          overlay.offsetHeight; // Force reflow
+          
+          // Show elements while maintaining position
+          [cardFront, textEl, headerEl, logoEl].forEach(el => {
             if (el) {
-              el.style.transition = fadeConfig;
-              if (el === cardFront || el === overlay) {
-                el.style.transform = 'translate(-50%, -50%)';
-              }
+              el.classList.remove('hidden');
+              el.style.visibility = 'visible';
+              el.style.transition = smoothConfig.opacity;
+              el.style.opacity = '0';
+              el.offsetHeight; // Force reflow
             }
           });
           
-          setTimeout(() => {
-            [overlay, cardFront, textEl, headerEl, logoEl].forEach(el => {
+          requestAnimationFrame(() => {
+            overlay.style.backgroundColor = 'rgba(255, 255, 255, 1)';
+            [cardFront, textEl, headerEl, logoEl].forEach(el => {
               if (el) el.style.opacity = '1';
             });
-          }, 50);
+          });
         });
       }
     });
