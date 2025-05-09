@@ -8,6 +8,21 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+  <div class="header-strip">
+    <div class="hamburger-menu">
+      <button class="menu-toggle">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <div class="menu-dropdown">
+        <a href="#" class="menu-item">Sign-in</a>
+        <a href="#" class="menu-item">Advertise</a>
+        <a href="#" class="menu-item">Contact</a>
+      </div>
+    </div>
+  </div>
+
   <!-- Logo Animation -->
   <video
     id="logoAnimation"
@@ -27,13 +42,66 @@
     <div id="cardOverlay" class="hidden">
       <img id="cardLogo" src="assets/images/logo.png" alt="Logo" />
       <p id="cardHeader">Starbucks</p>
-      <div id="cardText">
+      <div id="cardText"> Free coffee for a year</div>
       </div>
     </div>
 
     <!-- 3) Claim button (must be *inside* the relative container) -->
-    <button id="claimBtn" class="hidden">Claim Now</button>
+    <button id="claimBtn" class="hidden">Claim Reward</button>
   </div>
+
+  <!-- Phone Popup -->
+  <div id="phonePopup" class="phone-popup hidden">
+    <div class="popup-content">
+      <h3>Enter Phone Number</h3>
+      <input type="tel" id="phoneInput" placeholder="(123) 456-7890" maxlength="14">
+      <p class="disclaimer-text">Message & data rates may apply</p>
+      <p class="disclaimer-text">We value your privacy. Your information will not be saved or shared with third parties.</p>
+      <div class="popup-buttons">
+        <button id="submitPhone">Submit</button>
+        <button id="cancelPhone">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contact Popup -->
+  <div id="contactPopup" class="contact-popup hidden">
+    <div class="popup-content">
+      <h3>We'd be happy to hear from you!</h3>
+      <input type="email" id="contactEmail" placeholder="Your email address" />
+      <textarea id="contactMessage" placeholder="Your message" rows="4"></textarea>
+      <div class="popup-buttons">
+        <button id="submitContact">Submit</button>
+        <button id="cancelContact">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Waitlist Popup -->
+  <div id="waitlistPopup" class="waitlist-popup hidden">
+    <div class="popup-content">
+      <h3>Join the Waitlist</h3>
+      <input type="email" id="emailInput" placeholder="Enter your email address">
+      <div class="popup-buttons">
+        <button id="submitEmail">Join</button>
+        <button id="cancelEmail">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sign-in Popup -->
+  <div id="signInPopup" class="signin-popup hidden">
+    <div class="popup-content">
+      <h3>Join the Waitlist</h3>
+      <input type="email" id="signInEmail" placeholder="Enter your email address">
+      <p class="disclaimer-text">Be the first to know when we launch!</p>
+      <div class="popup-buttons">
+        <button id="submitSignIn">Join Waitlist</button>
+        <button id="cancelSignIn">Cancel</button>
+      </div>
+    </div>
+  </div>
+
   <!-- 3) Your bundled JS -->
   <script type="module" src="./src/main.js"></script>
 </body>
