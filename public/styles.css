@@ -26,7 +26,7 @@ html, body {
   top: 0;
   left: 0;
   width: 100%; /* Increased from 42.5% */
-  height: 70%; /* Increased from 42.5% */
+  height: 71%; /* Increased from 42.5% */
   margin: 28.75vh auto;
   left: 50%;
   transform: translateX(-50%);
@@ -36,6 +36,15 @@ html, body {
   overflow: hidden;
   background: transparent;
   z-index: 997;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out; /* Updated transition */
+}
+
+/* This class will now also handle the slide-up */
+#slideshow-container.faded-out {
+  opacity: 0;
+  transform: translateX(-50%) translateY(-60px); /* Adjust -60px as needed for slide distance */
+  pointer-events: none; /* Good practice for faded out elements */
 }
 
 /* 2. Card Animation */
@@ -43,11 +52,18 @@ html, body {
   width: 140%;
   height: auto;
   position: absolute;
-  top: 20%; /* Increase from 0% to move lower */
+  top: 20%;
   left: 50%;
-  transform: translate(-50%, -50%) scale(1.26);
+  transform: translate(-50%, -50%) scale(1.02); /* Changed from 1.26 to 1.02 to match hover size */
   object-fit: contain;
-  z-index: 997; /* Ensure it stays above logo */
+  z-index: 997;
+}
+
+/* Remove or modify the hover effect since we're using that scale by default */
+@media (hover: hover) {
+  #cardAnimation:hover {
+    transform: translate(-50%, -50%) scale(1.02); /* Keep same scale as default */
+  }
 }
 
 /* Card Front */
@@ -94,9 +110,10 @@ html, body {
   justify-content: center;
   text-align: center;
   width: 45%; /* Changed from 100% to create smaller background */
+  max-height: 170px;
   max-width: 180px; /* Added max-width constraint */
   padding: 2rem;
-  gap: 0.8rem;
+  gap: 1.2rem; /* Updated gap */
   background-color: rgba(255, 255, 255, 0);
   border-radius: 16px; /* Added border radius */
   transition: background-color 20s cubic-bezier(0.22, 0.61, 0.36, 1),
@@ -106,7 +123,7 @@ html, body {
 }
 
 #cardOverlay.visible {
-  background-color: rgba(255, 255, 255, 1);
+  background-color: rgb(253, 253, 253);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   pointer-events: auto;
 }
@@ -114,6 +131,7 @@ html, body {
 /* Text and Logo elements */
 #cardOverlay p#cardHeader,
 #cardOverlay img#cardLogo,
+#cardOverlay p#cardAddress,
 #cardOverlay p#cardText {
   opacity: 0;
   transition: opacity 20s cubic-bezier(0.22, 0.61, 0.36, 1);
@@ -122,6 +140,7 @@ html, body {
 
 #cardOverlay.visible p#cardHeader,
 #cardOverlay.visible img#cardLogo,
+#cardOverlay.visible p#cardAddress,
 #cardOverlay.visible p#cardText {
   opacity: 1;
 }
@@ -140,40 +159,160 @@ html, body {
 }
 
 /* Overlay Content */
-#cardOverlay p#cardHeader {
-  font-size: clamp(1rem, 3vw, 1.5rem);  /* Increased from 0.5rem, 2vw, 1rem */
-  margin-bottom: 0.8rem;
-  color: #111;
-  font-weight: 500;
-  letter-spacing: -0.3px;
-}
 
 #cardOverlay img#cardLogo {
-  max-height: clamp(15px, 8vw, 50px);
-  margin-bottom: 1.5rem;
+  width: 50px; /* Updated size */
+  height: auto;
+  margin-bottom: -.8rem;
 }
 
-#cardLogo {
-  width: auto;
-  height: 8.5vh; /* Reduced size */
-  margin-bottom: 0.5rem;
-  object-fit: contain;
+#cardOverlay p#cardHeader {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: clamp(2rem, 3vw, 1.5rem);
+  margin-top: 0.5rem;
+  margin-bottom: -0.3rem;
+  color: #1e1e1e;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+#cardOverlay p#cardAddress {
+  font-family: 'Outfit', sans-serif;
+  font-size: clamp(0.7rem, 1vw, 0.9rem);
+  line-height: 1.2;
+  font-weight: 400;
+  text-align: center;
+  color: #555;
+  margin-top: -0.7rem;
+}
+
+#cardOverlay p#cardSubheader {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: clamp(1.2rem, 1.5vw, 1.4rem);
+  line-height: 1.3;
+  font-weight: 675;
+  color: #00704A;
+  margin-top: -0.5rem;
+  margin-bottom: 0.3rem;
 }
 
 #cardOverlay p#cardText {
-  font-size: clamp(0.2rem, 0.8vw, 0.4rem);
-  line-height: 1;
+  font-family: 'Outfit', sans-serif;
+  font-size: clamp(0.6rem, 0.9vw, 0.8rem);
+  line-height: 1.2;
   font-weight: 400;
   text-align: center;
-  color: #333;
+  color: #666;
   margin: 0;
-  white-space: pre-line;
+  letter-spacing: 0.02em;
 }
 
 #cardText {
   opacity: 0;
+  font-weight: 100;
   transition: opacity 20s cubic-bezier(0.22, 0.61, 0.36, 1);
   transition-delay: 10s;
+}
+
+#cardSubheader {
+    font-size: 1.2rem;
+    color: #333;
+    opacity: 0;
+    margin-top: -0.5rem; /* Add negative margin to pull it up */
+    margin-bottom: 0.2rem; /* Keep some space below */
+}
+
+/* Update hyperlink styles */
+#cardOverlay p#cardAddress a {
+    color: #6e6f6f;  /* Softer gray color */
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+#cardOverlay p#cardAddress a:hover {
+    color: #00704A;  /* Match brand color on hover */
+    text-decoration: underline;
+}
+
+/* Card Overlay Sections */
+.overlay-section {
+    width: 100%;
+    text-align: center;
+    margin: 0.5rem 0;
+}
+
+#companySection h2 {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #333;
+}
+
+#addressSection p {
+    font-size: 0.9rem;
+    color: #666;
+    line-height: 1.3;
+}
+
+#rewardSection {
+    margin: 1rem 0;
+}
+
+#rewardSection h3 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #00704A;
+    margin-bottom: 0.2rem;
+}
+
+#rewardSection p {
+    font-size: 1rem;
+    color: #333;
+}
+
+#expirationSection p {
+    font-size: 0.8rem;
+    color: #666;
+    font-style: italic;
+}
+
+.overlay-section {
+  width: 100%;
+  text-align: center;
+}
+
+.company h2 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.3rem;
+}
+
+.address p {
+  font-size: 0.9rem;
+  color: #666;
+  line-height: 1.3;
+}
+
+.reward {
+  margin: 1rem 0;
+}
+
+.reward h3 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #00704A;
+  margin-bottom: 0.2rem;
+}
+
+.reward p {
+  font-size: 1rem;
+  color: #333;
+}
+
+.expiration p {
+  font-size: 0.8rem;
+  color: #666;
+  font-style: italic;
 }
 
 @keyframes slideUp {
@@ -231,13 +370,19 @@ html, body {
 
 @media (min-width: 1024px) {
   #cardAnimation, #cardFront {
-    top: 65%;
+    top: 50%;
     transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   }
   
   #logoAnimation {
-    top: 22%; /* Changed from 32% to move up 10% */
-    transform: translate(-50%, -50%) scale(3.888); /* Updated to match new size */
+    top: 25%; /* Significantly increased from 2% */
+    transform: translate(-50%, -50%) scale(3.888);
+    width: 100%;
+    height: 12%;
+    z-index: 996;
+    pointer-events: none;
+    clip-path: inset(0 0 15% 0);
+    position: fixed;
   }
   
   #claimBtn {
@@ -246,8 +391,72 @@ html, body {
   }
   #cardAnimation {
     width: 110%;
-    height: 110%;
-    max-width: 1250px; /* Increased from 1000px to maintain proportion */
+    height: 100%;
+    max-width: 2000px; /* Increased from 1000px to maintain proportion */
+  }
+  
+  #cardOverlay {
+    top: 55%;
+    transform: translate(-50%, -50%);
+    max-width: 180px; /* Increased from 160px for better text fit */
+    padding: 2rem; /* Decreased from 2.5rem for better spacing */
+    gap: -2.5rem; /* Increased for better spacing */
+  }
+
+  #cardOverlay p#cardHeader {
+    font-size: clamp(1.6rem, 2vw, 1.8rem); /* Adjusted for better fit */
+    margin-bottom: -1rem;
+    line-height: 1.2;
+  }
+
+  #cardOverlay p#cardAddress {
+    font-size: clamp(0.65rem, 0.9vw, 0.8rem); /* Slightly smaller */
+    line-height: 1.2;
+    margin-top: -0.1rem;
+  }
+
+  #cardOverlay p#cardSubheader {
+    font-size: clamp(0.9rem, 1.2vw, 1.1rem); /* Adjusted for proportional fit */
+    line-height: 1.3;
+    font-weight: 675;
+    margin-top: -.3rem;
+    margin-bottom: -.5rem;
+  }
+
+  #cardOverlay p#cardText {
+    font-size: clamp(0.6rem, 0.8vw, 0.7rem); /* Adjusted for better fit */
+    line-height: 1.2;
+    margin-top: 0.1rem;
+  }
+
+  #cardLogo {
+    height: 50px; /* Updated height */
+  }
+
+  .company h2 {
+    font-size: 1.4rem; /* Updated font size */
+  }
+
+  .address p {
+    font-size: 1rem; /* Updated font size */
+  }
+
+  .reward h3 {
+    font-size: 2rem; /* Updated font size */
+  }
+
+  .reward p {
+    font-size: 1.2rem; /* Updated font size */
+  }
+
+  .expiration p {
+    font-size: 0.9rem; /* Updated font size */
+  }
+
+  #cardOverlay p#cardSubheader {
+    font-size: clamp(1rem, 1.3vw, 1.2rem); /* Decreased from 1.2rem, 1.5vw, 1.4rem */
+    line-height: 1.3;
+    font-weight: 675;
   }
 }
 
@@ -256,7 +465,7 @@ html, body {
   position: fixed;
   bottom: 7%; /* Decrease from 27% to move lower */
   left: 50%;
-  transform: translateX(-50%);
+  transform: translateX(-50%); /* Initial horizontal centering */
   padding: 12px 28px;
   background-color: #00704A;
   color: white;
@@ -266,16 +475,21 @@ html, body {
   font-weight: 500;
   cursor: pointer;
   opacity: 0;
-  visibility: hidden;
-  transition: opacity 20s cubic-bezier(0.22, 0.61, 0.36, 1);  /* Simplified to match logo exactly */
-  transition-delay: 2.5s; /* Logo starts at 10s, so this starts 1.5s earlier */
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out, background-color 0.3s ease;
   z-index: 1000;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 #claimBtn.visible {
-  opacity: 0.35; /* Changed from 1 to 0.35 for 35% transparency */
+  opacity: 1;
   visibility: visible;
+}
+
+/* New class for claim button to fade out and slide up */
+#claimBtn.faded-out-slide-up {
+  opacity: 0 !important; /* Important to override .visible if it's not removed quickly enough */
+  transform: translateX(-50%) translateY(-60px) !important; /* Combine with existing translateX, adjust -60px */
+  pointer-events: none;
 }
 
 #claimBtn:not(.hidden) {
@@ -311,8 +525,8 @@ html, body {
 @media (min-width: 1024px) {
   #slideshow-container {
     top: var(--video-height);
-    height: var(--card-height);
-    max-width: 600px;
+    height: 700px;
+    max-width: 375px;
     margin: 0 auto;
     left: 50%;
     transform: translateX(-50%);
@@ -420,7 +634,7 @@ html, body {
   pointer-events: none;
   overflow: hidden;
   clip-path: inset(0 0 15% 0);
-  transition: transform 0.3s ease-out;
+  transition: opacity 1.2s cubic-bezier(0.25, 0.1, 0.25, 1); /* Slower and smoother fade-in */
 }
 
 /* Ensure proper stacking order */
@@ -428,20 +642,11 @@ html, body {
   z-index: 1000;
 }
 
-@media (hover: hover) {
-  #cardAnimation:hover {
-    transform: translate(-50%, -50%) scale(1.02);
-  }
-  
-  #cardOverlay:hover {
-    transform: scale(1.02);
-  }
-}
-
 /* Phone Popup Styles */
 .phone-popup,
 .contact-popup,
-.waitlist-popup {
+.waitlist-popup,
+.signin-popup { /* Combined rule for all popups */
     position: fixed;
     top: 0;
     left: 0;
@@ -451,7 +656,7 @@ html, body {
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 2000;
+    z-index: 10002; /* Increased to be on top of header-strip and postSubmitOverlay */
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.3s ease;
@@ -459,7 +664,8 @@ html, body {
 
 .phone-popup.visible,
 .contact-popup.visible,
-.waitlist-popup.visible {
+.waitlist-popup.visible,
+.signin-popup.visible { /* Combined rule for all popups */
     opacity: 1;
     visibility: visible;
 }
@@ -639,15 +845,14 @@ html, body {
     width: 100%;
     height: 60px;
     background-color: #00704A;
-    z-index: 2000;
+    z-index: 10001; /* Increased from 2000 to be above postSubmitOverlay */
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     display: flex;
     justify-content: flex-end;
     align-items: center;
     padding-right: 20px;
     opacity: 0;
-    transition: opacity 20s cubic-bezier(0.22, 0.61, 0.36, 1);
-    transition-delay: 1s;
+    transition: opacity 8s cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
 /* Add these classes for fade-in */
@@ -690,4 +895,119 @@ html, body {
 #signInEmail:focus {
     border-color: #00704A;
     outline: none;
+}
+
+/* Post Submit Overlay Styles */
+#postSubmitOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,          /* Top part is transparent */
+    transparent 33.33%,      /* End of transparent top third */
+    rgba(255, 255, 255, 0.95) 33.33%, /* Start of white part, slightly below top third */
+    rgba(255, 255, 255, 0.95) 100%     /* Bottom is white */
+  );
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end; /* Push content wrapper to the bottom of the flex container */
+  align-items: center;     /* Center content wrapper horizontally */
+  z-index: 10000;            /* This is below the new header-strip z-index */
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 4.5s cubic-bezier(0.25, 0.1, 0.25, 1); 
+  box-sizing: border-box;
+  font-family: 'Helvetica Neue', Arial, sans-serif; 
+  /* Remove direct padding if wrapper handles it */
+}
+
+#postSubmitOverlay.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.post-submit-content-wrapper {
+  width: 100%;
+  max-width: 600px; /* Optional: constrain width of text content */
+  padding: 20px; /* Horizontal padding */
+  /* padding-top: 5vh; /* Optional: Add some explicit top padding for the block */
+  padding-bottom: 35vh; /* Adjusted from 45vh - fine-tune this to position the whole block */
+  box-sizing: border-box;
+  text-align: center; /* Ensure text inside wrapper is centered */
+  color: #333; /* Text color, inherited by children */
+  display: flex; /* Ensures align-items works */
+  flex-direction: column; /* Stack children vertically */
+  align-items: center; /* Center children horizontally */
+}
+
+/* New style for Thank You message */
+#postSubmitOverlay #thankYouMessage {
+  font-size: 1.9em; /* Prominent font size */
+  font-weight: 600;
+  color: #00704A; /* Your brand color */
+  margin-bottom: 20px; /* Space below "Thank you!" */
+}
+
+#postSubmitOverlay #rewardSentMessage {
+  margin-bottom: 25px; /* Increased space before "Play again" */
+  font-size: 1.3em;
+  font-weight: 500;
+}
+
+#postSubmitOverlay .play-again-message {
+  margin-top: 0; /* Reset margin-top, spacing handled by element above */
+  font-size: 1.1em;
+  color: #555;
+  margin-bottom: 8px; /* Space before the timer */
+}
+
+/* New styles for timer container and labels */
+#timerContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 25px; /* Space between timer block and icon */
+  width: 100%; /* Ensure it takes width for label distribution */
+}
+
+#playAgainTimer {
+  font-size: 3em;
+  font-weight: bold;
+  color: #000;
+  letter-spacing: 1px;
+  /* margin-top and margin-bottom are handled by #timerContainer and .play-again-message */
+}
+
+.timer-labels {
+  display: flex;
+  justify-content: space-between; /* Distribute labels */
+  width: 60%; /* Reduced from 80% - Adjust this value as needed */
+  max-width: 200px; /* Reduced from 280px - Adjust this value as needed */
+  margin-top: 5px; /* Space between timer numbers and labels */
+}
+
+.timer-label {
+  font-size: 0.75em; /* Smaller font for labels */
+  color: #666;      /* Lighter color for labels */
+  text-transform: uppercase;
+  flex-basis: 33%; /* Distribute space somewhat evenly */
+  text-align: center;
+  margin-bottom: 15px; /* Space below labels */
+}
+
+
+.sent-icon {
+  color: #00704A;
+  width: 56px;
+  height: 56px;
+  margin-top: -25px; /* Space above icon */
+}
+
+/* Ensure slideshow-container fade is also smooth */
+#slideshow-container.faded-out {
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
 }

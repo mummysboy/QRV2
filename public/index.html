@@ -4,8 +4,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, viewport-fit=cover, user-scalable=no, maximum-scale=1.0">
-  <title>Card + Overlay</title>
+  <title>QRewards</title>
+  <meta name="description" content="Scan. Play. Win!">
   <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
   <div class="header-strip">
@@ -42,8 +44,13 @@
     <div id="cardOverlay" class="hidden">
       <img id="cardLogo" src="assets/images/logo.png" alt="Logo" />
       <p id="cardHeader">Starbucks</p>
-      <div id="cardText"> Free coffee for a year</div>
-      </div>
+      <p id="cardAddress">
+        <a href="https://www.google.com/maps?q=2132+Chestnut+St+San+Francisco,+CA" target="_blank" rel="noopener noreferrer">
+          2132 Chestnut St San Francisco, CA
+        </a>
+      </p>
+      <p id="cardSubheader">Free coffee for a year</p>
+      <div id="cardText">Expires: 04/01/2025</div>
     </div>
 
     <!-- 3) Claim button (must be *inside* the relative container) -->
@@ -74,35 +81,31 @@
         <button id="submitContact">Submit</button>
         <button id="cancelContact">Cancel</button>
       </div>
-    </div>
-  </div>
+    </div> <!-- Closing for contactPopup's popup-content -->
+  </div> <!-- Closing for contactPopup -->
 
-  <!-- Waitlist Popup -->
-  <div id="waitlistPopup" class="waitlist-popup hidden">
-    <div class="popup-content">
-      <h3>Join the Waitlist</h3>
-      <input type="email" id="emailInput" placeholder="Enter your email address">
-      <div class="popup-buttons">
-        <button id="submitEmail">Join</button>
-        <button id="cancelEmail">Cancel</button>
+  <!-- Post Submit Overlay -->
+  <div id="postSubmitOverlay" class="hidden">
+    <div class="post-submit-content-wrapper">
+      <p id="rewardSentMessage">We sent your reward via text</p>
+      <p class="play-again-message">You may play again in...</p>
+      <div id="timerContainer"> <!-- Added wrapper for timer and labels -->
+        <div id="playAgainTimer">24:00:00</div>
+        <div class="timer-labels">
+          <span class="timer-label">Hours</span>
+          <span class="timer-label">Minutes</span>
+          <span class="timer-label">Seconds</span>
+        </div>
+      <p id="thankYouMessage">Thank you!</p>
       </div>
+      <svg class="sent-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="48" height="48" fill="currentColor">
+        <path d="M0 0h24v24H0V0z" fill="none"/>
+        <path d="M22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6zm-2 0l-8 5-8-5h16zm0 12H4V8l8 5 8-5v10z"/>
+      </svg>
     </div>
   </div>
 
-  <!-- Sign-in Popup -->
-  <div id="signInPopup" class="signin-popup hidden">
-    <div class="popup-content">
-      <h3>Join the Waitlist</h3>
-      <input type="email" id="signInEmail" placeholder="Enter your email address">
-      <p class="disclaimer-text">Be the first to know when we launch!</p>
-      <div class="popup-buttons">
-        <button id="submitSignIn">Join Waitlist</button>
-        <button id="cancelSignIn">Cancel</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- 3) Your bundled JS -->
-  <script type="module" src="./src/main.js"></script>
+  <script type="module" src="src/config.js"></script>
+  <script type="module" src="src/main.js" defer></script>
 </body>
 </html>
