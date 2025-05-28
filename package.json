@@ -1,0 +1,27 @@
+{
+  "name": "qrewardsrsm-main-copy-3",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mummysboy/QRewards.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mummysboy/QRewards/issues"
+  },
+  "homepage": "https://github.com/mummysboy/QRewards#readme",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.49.8",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "twilio": "^5.6.1"
+  },
+  "description": ""
+}
