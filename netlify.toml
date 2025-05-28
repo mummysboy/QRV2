@@ -1,0 +1,9 @@
+[build]
+  # Directory for your static site
+  publish = "public"
+  # Directory for your Serverless Functions
+  functions = "netlify/functions"
+
+[dev]
+  # When running `netlify dev`, use the same functions directory
+  functions = "netlify/functions"

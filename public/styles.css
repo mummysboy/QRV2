@@ -411,15 +411,15 @@ html, body {
 
   #cardOverlay p#cardAddress {
     font-size: clamp(0.65rem, 0.9vw, 0.8rem); /* Slightly smaller */
-    line-height: 1.2;
-    margin-top: -0.1rem;
+    line-height: .9;
+    margin-top: -.3rem;
   }
 
   #cardOverlay p#cardSubheader {
-    font-size: clamp(0.9rem, 1.2vw, 1.1rem); /* Adjusted for proportional fit */
+    font-size: clamp(.9rem, 1.2vw, 1.1rem); /* Adjusted for proportional fit */
     line-height: 1.3;
     font-weight: 675;
-    margin-top: -.3rem;
+    margin-top: -.8rem;
     margin-bottom: -.5rem;
   }
 
@@ -659,7 +659,7 @@ html, body {
     z-index: 10002; /* Increased to be on top of header-strip and postSubmitOverlay */
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.3s ease;
+    transition: opacity 1s ease-in-out, visibility 0s linear 1s;
 }
 
 .phone-popup.visible,
@@ -668,6 +668,7 @@ html, body {
 .signin-popup.visible { /* Combined rule for all popups */
     opacity: 1;
     visibility: visible;
+    transition: opacity 1s ease-in-out, visibility 0s linear 0s;
 }
 
 .popup-content {
@@ -903,7 +904,7 @@ html, body {
   top: 0;
   left: 0;
   width: 100%;
-  height: 100%;
+  height: 120%;
   background: linear-gradient(
     to bottom,
     transparent 0%,          /* Top part is transparent */
