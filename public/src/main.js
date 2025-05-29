@@ -545,30 +545,29 @@ if (submitPhone) {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
-                to:       phoneNumber,  // e.g. "4155551234" or "+14155551234"
+                to:       phoneNumber,
                 claimId:  claimId
               })
             })
-            .then(r => {
+            .then(async r => { // Add async here
+              console.log('SMS function raw response status:', r.status); // Log status
+              const responseText = await r.text(); // Get response as text
+              console.log('SMS function response text:', responseText); // Log text
               if (!r.ok) {
-                // Try to get more details from the response if possible
-                return r.text().then(text => {
-                    throw new Error(`SMS failed: ${r.status} ${r.statusText} - ${text}`);
-                });
+                  throw new Error(`SMS failed: ${r.status} ${r.statusText} - ${responseText}`);
               }
-              console.log('Verification SMS sent!');
-              return r.json(); // Or r.text() if your function doesn't return JSON
+              console.log('Verification SMS sent (according to front-end)!');
+              try {
+                return JSON.parse(responseText); // Try to parse if you expect JSON
+              } catch (e) {
+                return responseText; // Return text if not JSON
+              }
             })
             .then(data => {
-                if (data) console.log('SMS function response:', data);
+                if (data) console.log('SMS function parsed response data:', data);
             })
             .catch(err => {
-              console.error('Error sending SMS:', err);
-              // It's important not to block the UI transition if SMS fails,
-              // but the user should be informed if critical.
-              // For now, we just log it, as the primary claim is saved.
-              // You might want to add a non-blocking notification later.
-              // alert('Couldn’t send SMS—please try again in a moment.'); // Optional: inform user
+              console.error('Error sending SMS (from front-end catch):', err);
             });
             // --- END SEND SMS ---
 
