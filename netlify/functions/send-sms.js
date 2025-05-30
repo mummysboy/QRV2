@@ -17,6 +17,8 @@ if (accountSid && authToken) {
 }
 
 exports.handler = async (event) => {
+  console.log("[send-sms] Minimal function invoked. Method:", event.httpMethod);
+
   if (event.httpMethod === "OPTIONS") {
     // Handle preflight CORS requests if necessary
     return {
