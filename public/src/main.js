@@ -542,7 +542,7 @@ if (submitPhone) {
             console.log('Claim record saved:', claimId);
 
             // --- SEND SMS ---
-            fetch('https://qrewards.netlify.app/.netlify/functions/send-sms', {
+            fetch('/.netlify/functions/send-sms', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
