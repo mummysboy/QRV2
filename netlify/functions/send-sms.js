@@ -4,8 +4,8 @@ const twilio = require("twilio");
 
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
-const twilioWhatsAppFromNumber = process.env.TWILIO_WHATSAPP_FROM_NUMBER; // e.g., whatsapp:+14155238886
-const twilioWhatsAppContentSid = process.env.TWILIO_WHATSAPP_CONTENT_SID; // Your template SID
+const twilioPhoneNumber = process.env.TWILIO_PHONE_NUMBER; // Your Twilio 'From' number for SMS
+const appDomain = process.env.DOMAIN || "https://your-app-url.com"; // Fallback if DOMAIN env var is not set
 
 let client;
 if (accountSid && authToken) {
@@ -35,7 +35,7 @@ exports.handler = async (event) => {
     return {
       statusCode: 405,
       body: JSON.stringify({ error: "Method Not Allowed. Please use POST." }),
-      headers: { Allow: "POST" },
+      headers: { "Content-Type": "application/json", Allow: "POST, OPTIONS" },
     };
   }
 
@@ -48,21 +48,19 @@ exports.handler = async (event) => {
     };
   }
 
-  if (!twilioWhatsAppFromNumber || !twilioWhatsAppContentSid) {
+  if (!twilioPhoneNumber) {
     console.error(
-      "Twilio WhatsApp 'From' number or Content SID is missing from environment variables."
+      "Twilio Phone Number (TWILIO_PHONE_NUMBER) is missing from environment variables."
     );
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: "WhatsApp configuration error on server." }),
+      body: JSON.stringify({ error: "Twilio 'From' number configuration error on server." }),
       headers: { "Content-Type": "application/json" },
     };
   }
 
   try {
-    // The client-side main.js sends `to` (e.g., +1xxxxxxxxxx) and `claimId`.
-    // The `body` parameter from the client will be ignored for WhatsApp templates.
-    const { to: toNumber, claimId } = JSON.parse(event.body);
+    const { to: toNumber, claimId } = JSON.parse(event.body); // 'to' should be E.164 like +1xxxxxxxxxx
 
     if (!toNumber || !claimId) {
       return {
@@ -74,47 +72,38 @@ exports.handler = async (event) => {
       };
     }
 
-    // Format the 'To' number for WhatsApp
-    const whatsappToNumber = `whatsapp:${toNumber}`; // Assumes 'toNumber' is already in E.164 like +14155551234
-
-    // Construct ContentVariables based on your template's needs.
-    // This example assumes your template uses '1' for the claimId.
-    // Adjust if your template variables are different (e.g., {"customer_name": "John", "order_id": claimId})
-    const contentVariables = JSON.stringify({
-      "1": claimId,
-      // Add other variables if your template requires them, e.g.:
-      // "2": "some other value",
-    });
+    // Construct the SMS body
+    // Ensure your appDomain ends with a trailing slash if claim_page.html needs it, or adjust the path.
+    const messageBody = `Your QRewards claim ID is ${claimId}. View your reward: ${appDomain}claim_page.html?id=${claimId}`;
 
     console.log(
-      `Attempting to send WhatsApp message to: ${whatsappToNumber} from: ${twilioWhatsAppFromNumber} with ContentSid: ${twilioWhatsAppContentSid}`
+      `Attempting to send SMS to: ${toNumber} from: ${twilioPhoneNumber}`
     );
-    console.log(`ContentVariables: ${contentVariables}`);
+    console.log(`Message Body: ${messageBody}`);
 
     const message = await client.messages.create({
-      contentSid: twilioWhatsAppContentSid,
-      contentVariables: contentVariables,
-      from: twilioWhatsAppFromNumber,
-      to: whatsappToNumber,
+      body: messageBody,
+      from: twilioPhoneNumber,
+      to: toNumber, // Assumes 'toNumber' is already E.164 formatted (e.g., +14155551234) by the client
     });
 
-    console.log("WhatsApp message sent successfully. SID:", message.sid);
+    console.log("SMS sent successfully. SID:", message.sid);
     return {
       statusCode: 200,
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        message: "WhatsApp message initiated successfully.",
+        message: "SMS initiated successfully.",
         sid: message.sid,
       }),
     };
   } catch (err) {
-    console.error("Error sending WhatsApp message:", err);
+    console.error("Error sending SMS:", err);
     const errorMessage = err.message || "An internal server error occurred.";
     const errorStatus = err.status || (err.response && err.response.status) || 500;
     return {
       statusCode: errorStatus,
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ error: "Failed to send WhatsApp message.", details: errorMessage }),
+      body: JSON.stringify({ error: "Failed to send SMS.", details: errorMessage }),
     };
   }
 };
