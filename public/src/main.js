@@ -1,4 +1,5 @@
 // ─── CONFIGURATION ────────────────────────────────────────────────────
+
 const CONFIG = {
   totalSlides: 220,
   overlayStart: 50.5, // Time in seconds when overlay should appear
@@ -447,10 +448,11 @@ if (phoneInput) {
 
 if (submitPhone) {
     submitPhone.addEventListener('click', async () => {
-        const phoneNumber = phoneInput.value.replace(/\D/g, '');
+        const rawPhoneNumber = phoneInput.value.replace(/\D/g, ''); // Renamed to avoid confusion
 
-        if (phoneNumber.length === 10 && state.currentCardId && state.supabaseClient) {
-            console.log('Phone number submitted:', phoneNumber, 'for cardId:', state.currentCardId);
+        if (rawPhoneNumber.length === 10 && state.currentCardId && state.supabaseClient) {
+            const formattedPhoneNumber = '+1' + rawPhoneNumber; // Add +1 prefix
+            console.log('Raw phone number submitted:', rawPhoneNumber, 'Formatted:', formattedPhoneNumber, 'for cardId:', state.currentCardId);
 
             // --- DECREMENT QUANTITY LOGIC ---
             try {
@@ -473,7 +475,6 @@ if (submitPhone) {
                         phonePopup.classList.remove('visible');
                         phonePopup.classList.add('hidden');
                     }
-                    // Consider alternative UI update, e.g., reload or show "no rewards"
                     return;
                 }
 
@@ -529,7 +530,7 @@ if (submitPhone) {
                     logokey:     cardDataForClaim.logokey,
                     subheader:   cardDataForClaim.subheader,
                     expires:     cardDataForClaim.expires,
-                    phone:       phoneNumber,
+                    phone:       formattedPhoneNumber, // Use formattedPhoneNumber
                     claimed_at:  new Date().toISOString()
                 });
 
@@ -541,33 +542,34 @@ if (submitPhone) {
             console.log('Claim record saved:', claimId);
 
             // --- SEND SMS ---
-            fetch('/.netlify/functions/send-sms', {
+            fetch('https://qrewards.netlify.app/.netlify/functions/send-sms', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
-                to:       phoneNumber,
+                to:       formattedPhoneNumber,  // Use formattedPhoneNumber
                 claimId:  claimId
               })
             })
-            .then(async r => { // Add async here
-              console.log('SMS function raw response status:', r.status); // Log status
-              const responseText = await r.text(); // Get response as text
-              console.log('SMS function response text:', responseText); // Log text
+            .then(r => {
               if (!r.ok) {
-                  throw new Error(`SMS failed: ${r.status} ${r.statusText} - ${responseText}`);
+                // Try to get more details from the response if possible
+                return r.text().then(text => {
+                    throw new Error(`SMS failed: ${r.status} ${r.statusText} - ${text}`);
+                });
               }
-              console.log('Verification SMS sent (according to front-end)!');
-              try {
-                return JSON.parse(responseText); // Try to parse if you expect JSON
-              } catch (e) {
-                return responseText; // Return text if not JSON
-              }
+              console.log('Verification SMS sent!');
+              return r.json(); // Or r.text() if your function doesn't return JSON
             })
             .then(data => {
-                if (data) console.log('SMS function parsed response data:', data);
+                if (data) console.log('SMS function response:', data);
             })
             .catch(err => {
-              console.error('Error sending SMS (from front-end catch):', err);
+              console.error('Error sending SMS:', err);
+              // It's important not to block the UI transition if SMS fails,
+              // but the user should be informed if critical.
+              // For now, we just log it, as the primary claim is saved.
+              // You might want to add a non-blocking notification later.
+              // alert('Couldn’t send SMS—please try again in a moment.'); // Optional: inform user
             });
             // --- END SEND SMS ---
 
@@ -617,13 +619,13 @@ if (submitPhone) {
             }
             // --- END UI TRANSITION ---
 
-        } else if (phoneNumber.length !== 10) {
+        } else if (rawPhoneNumber.length !== 10) {
             alert('Please enter a valid 10-digit phone number.');
         } else {
             // This handles cases where currentCardId or supabaseClient might be missing
             alert('Cannot process claim at this moment. Please ensure a reward is displayed and try again.');
             console.warn('SubmitPhone pre-check failed:', {
-                phoneNumberLength: phoneNumber.length,
+                phoneNumberLength: rawPhoneNumber.length,
                 currentCardId: state.currentCardId,
                 supabaseClientReady: !!state.supabaseClient
             });
