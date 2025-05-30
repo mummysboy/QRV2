@@ -4,8 +4,10 @@ const twilio = require("twilio");
 
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
-const twilioPhoneNumber = process.env.TWILIO_PHONE_NUMBER; // Your Twilio 'From' number for SMS
-const appDomain = process.env.DOMAIN || "https://your-app-url.com"; // Fallback if DOMAIN env var is not set
+// TWILIO_PHONE_NUMBER is no longer directly used for sending if using Messaging Service
+// const twilioPhoneNumber = process.env.TWILIO_PHONE_NUMBER; 
+const messagingServiceSid = process.env.TWILIO_MESSAGING_SERVICE_SID; // New environment variable
+const appDomain = process.env.DOMAIN || "https://your-app-url.com";
 
 let client;
 if (accountSid && authToken) {
@@ -17,14 +19,13 @@ if (accountSid && authToken) {
 }
 
 exports.handler = async (event) => {
-  console.log("[send-sms] Minimal function invoked. Method:", event.httpMethod);
+  console.log("[send-sms] Function invoked. Method:", event.httpMethod);
 
   if (event.httpMethod === "OPTIONS") {
-    // Handle preflight CORS requests if necessary
     return {
-      statusCode: 204, // No Content
+      statusCode: 204,
       headers: {
-        "Access-Control-Allow-Origin": "*", // Adjust for your domain in production
+        "Access-Control-Allow-Origin": "*", 
         "Access-Control-Allow-Methods": "POST, OPTIONS",
         "Access-Control-Allow-Headers": "Content-Type",
       },
@@ -48,19 +49,19 @@ exports.handler = async (event) => {
     };
   }
 
-  if (!twilioPhoneNumber) {
+  if (!messagingServiceSid) { // Check for the Messaging Service SID
     console.error(
-      "Twilio Phone Number (TWILIO_PHONE_NUMBER) is missing from environment variables."
+      "Twilio Messaging Service SID (TWILIO_MESSAGING_SERVICE_SID) is missing from environment variables."
     );
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: "Twilio 'From' number configuration error on server." }),
+      body: JSON.stringify({ error: "Twilio Messaging Service configuration error on server." }),
       headers: { "Content-Type": "application/json" },
     };
   }
 
   try {
-    const { to: toNumber, claimId } = JSON.parse(event.body); // 'to' should be E.164 like +1xxxxxxxxxx
+    const { to: toNumber, claimId } = JSON.parse(event.body); 
 
     if (!toNumber || !claimId) {
       return {
@@ -72,20 +73,18 @@ exports.handler = async (event) => {
       };
     }
 
-    // Construct the SMS body
-    // Ensure appDomain is like "https://qrewards.netlify.app" (no trailing slash)
-    const rewardUrl = `${appDomain}/id=${claimId}`; 
+    const rewardUrl = `https://qrewards.netlify.app/id=${claimId}`; 
     const messageBody = `Your QRewards is ready to use. View your reward: ${rewardUrl}`;
 
     console.log(
-      `Attempting to send SMS to: ${toNumber} from: ${twilioPhoneNumber}`
+      `Attempting to send SMS to: ${toNumber} using MessagingServiceSid: ${messagingServiceSid}`
     );
     console.log(`Message Body: ${messageBody}`);
 
     const message = await client.messages.create({
       body: messageBody,
-      from: twilioPhoneNumber,
-      to: toNumber, // Assumes 'toNumber' is already E.164 formatted (e.g., +14155551234) by the client
+      messagingServiceSid: messagingServiceSid, // Use Messaging Service SID here
+      to: toNumber, 
     });
 
     console.log("SMS sent successfully. SID:", message.sid);
