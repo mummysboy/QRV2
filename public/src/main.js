@@ -451,7 +451,7 @@ if (phoneInput) {
 
 if (submitPhone) {
     submitPhone.addEventListener('click', async () => {
-        const rawPhoneNumber = phoneInput.value.replace(/\D/g, ''); // Renamed to avoid confusion
+        const rawPhoneNumber = phoneInput.value.replace(/\D/g, '');
 
         if (rawPhoneNumber.length === 10 && state.currentCardId && state.supabaseClient) {
             const formattedPhoneNumber = '+1' + rawPhoneNumber; // Add +1 prefix
