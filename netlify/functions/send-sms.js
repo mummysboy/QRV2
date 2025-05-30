@@ -73,8 +73,9 @@ exports.handler = async (event) => {
     }
 
     // Construct the SMS body
-    // Ensure your appDomain ends with a trailing slash if claim_page.html needs it, or adjust the path.
-    const messageBody = `Your QRewards claim ID is ${claimId}. View your reward: ${appDomain}claim_page.html?id=${claimId}`;
+    // Ensure appDomain is like "https://qrewards.netlify.app" (no trailing slash)
+    const rewardUrl = `${appDomain}/id=${claimId}`; 
+    const messageBody = `Your QRewards is ready to use. View your reward: ${rewardUrl}`;
 
     console.log(
       `Attempting to send SMS to: ${toNumber} from: ${twilioPhoneNumber}`
