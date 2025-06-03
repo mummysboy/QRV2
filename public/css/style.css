@@ -1,0 +1,55 @@
+/* ... existing styles ... */
+
+/* Terms and Conditions Checkbox in Phone Popup */
+.terms-container {
+  margin-top: 15px;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  font-size: 0.9em;
+  color: #555;
+  justify-content: center; 
+}
+
+.terms-container input[type="checkbox"] {
+  margin-right: 8px;
+  width: 16px;
+  height: 16px;
+  accent-color: #007bff; /* Or your primary color */
+}
+
+.terms-container label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.terms-container a {
+  color: #007bff; /* Or your primary link color */
+  text-decoration: underline;
+  margin-left: 4px;
+}
+
+.terms-container a:hover {
+  color: #0056b3;
+}
+
+/* Phone Popup Submit Button Disabled State */
+#phonePopup .popup-buttons button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* REMOVE ALL MODAL STYLES like .modal, .modal-content-wrapper, etc. */
+/* For example:
+.modal { ... }
+.modal.hidden { ... }
+.modal.visible { ... }
+.modal .modal-content-wrapper { ... }
+.modal .modal-header { ... }
+.modal .close-button { ... }
+.modal .modal-body { ... }
+*/
+
+/* ... existing styles ... */
