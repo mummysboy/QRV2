@@ -1,5 +1,4 @@
 // ─── CONFIGURATION ────────────────────────────────────────────────────
-
 const CONFIG = {
   totalSlides: 220,
   overlayStart: 50.5, // Time in seconds when overlay should appear
@@ -18,7 +17,7 @@ const CONFIG = {
   supabaseAnonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1YW9weWt1dnpvZGhneHV0aG9jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcyNDcyNTIsImV4cCI6MjA2MjgyMzI1Mn0.NqudqNBIt1VAB9E0-VmSEglA5z1wcLk4GMt0PVoF6Sw'
 };
 
-const { supabaseUrl, supabaseAnonKey } = window.config;
+const { supabaseUrl, supabaseAnonKey } = window.config; // <--- PROBLEM HERE
 
 
 // ─── STATE & DOM REFS ────────────────────────────────────────────────
@@ -113,8 +112,8 @@ function generateClaimId(length = 16) {
 
 // ─── SUPABASE FUNCTIONS ───────────────────────────────────────────────
 function initializeSupabase() {
-  // This function will now be called by waitForSupabase
   try {
+    // USES THE HARDCODED CONFIG OBJECT
     state.supabaseClient = window.supabase.createClient(CONFIG.supabaseUrl, CONFIG.supabaseAnonKey);
     console.log("Supabase client initialized.");
     return true; // Indicate success
@@ -784,43 +783,162 @@ function handleOrientationChange() {
 }
 
 // ─── CONTACT POPUP FUNCTIONALITY ─────────────────────────────────────
+// --- CONTACT POPUP ---
+const contactMenuLink = document.getElementById('contactMenuLink');
 const contactPopup = document.getElementById('contactPopup');
+const closeContactPopup = document.getElementById('closeContactPopup');
+const cancelContact = document.getElementById('cancelContact');
+const submitContact = document.getElementById('submitContact');
 const contactEmail = document.getElementById('contactEmail');
 const contactMessage = document.getElementById('contactMessage');
-const submitContact = document.getElementById('submitContact');
+const contactStatusMessage = document.getElementById('contactStatusMessage');
+const contactFormFieldsAndButtons = [contactEmail, contactMessage, submitContact, cancelContact]; // Helper array
 
-if (submitContact && contactPopup && contactEmail && contactMessage) {
-    submitContact.addEventListener('click', () => {
-        const email = contactEmail.value;
-        const message = contactMessage.value;
-        
-        if (validateEmail(email) && message.trim()) {
-            console.log('Contact form submitted:', { email, message });
-            contactPopup.classList.remove('visible');
-            contactPopup.classList.add('hidden');
-            contactEmail.value = '';
-            contactMessage.value = '';
-        } else {
-            alert('Please enter a valid email and message');
+if (contactMenuLink) {
+  contactMenuLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (contactPopup) {
+      contactPopup.classList.remove('hidden');
+      contactPopup.classList.add('visible');
+      if (contactEmail) {
+        contactEmail.focus();
+      }
+    }
+  });
+}
+
+function closeContactForm() {
+    if (contactPopup) {
+        contactPopup.classList.remove('visible');
+        contactPopup.classList.add('hidden');
+        setTimeout(() => {
+            if (contactEmail) contactEmail.value = '';
+            if (contactMessage) contactMessage.value = '';
+            if (contactStatusMessage) {
+                contactStatusMessage.textContent = '';
+                contactStatusMessage.className = 'status-message';
+            }
+            if (contactEmail) contactEmail.classList.remove('input-error');
+            if (contactMessage) contactMessage.classList.remove('input-error');
+            contactFormFieldsAndButtons.forEach(el => {
+                if (el && el.style) el.style.display = '';
+            });
+            const buttonsContainer = document.querySelector('.contact-popup .popup-buttons');
+            if (buttonsContainer && buttonsContainer.style) {
+                 buttonsContainer.style.display = '';
+            }
+            if (submitContact) {
+                submitContact.disabled = false;
+                submitContact.textContent = 'Submit';
+            }
+        }, 600); 
+    }
+}
+
+if (closeContactPopup) {
+    closeContactPopup.addEventListener('click', closeContactForm);
+}
+if (cancelContact) {
+    cancelContact.addEventListener('click', closeContactForm);
+}
+
+if (contactPopup) {
+    contactPopup.addEventListener('click', (event) => {
+        if (event.target === contactPopup) {
+            closeContactForm();
         }
     });
 }
 
-// ─── SIGN-IN POPUP FUNCTIONALITY ─────────────────────────────────────
-const waitlistPopup = document.getElementById('waitlistPopup');
-const emailInput = document.getElementById('emailInput');
-const submitWaitlist = document.getElementById('submitWaitlist');
 
-if (submitWaitlist && waitlistPopup && emailInput) {
-    submitWaitlist.addEventListener('click', () => {
-        const email = emailInput.value;
-        if (validateEmail(email)) {
-            console.log('Waitlist email submitted:', email);
-            waitlistPopup.classList.remove('visible');
-            waitlistPopup.classList.add('hidden');
-            emailInput.value = '';
+if (submitContact) {
+    submitContact.addEventListener('click', async () => {
+        let isValid = true;
+        if (contactStatusMessage) {
+            contactStatusMessage.textContent = '';
+            contactStatusMessage.className = 'status-message'; 
+        }
+        if (contactEmail) contactEmail.classList.remove('input-error');
+        if (contactMessage) contactMessage.classList.remove('input-error');
+
+        const emailValue = contactEmail.value.trim();
+        const messageValue = contactMessage.value.trim();
+
+        if (!emailValue) {
+            contactEmail.classList.add('input-error');
+            isValid = false;
         } else {
-            alert('Please enter a valid email address');
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailPattern.test(emailValue)) {
+                contactEmail.classList.add('input-error');
+                if (contactStatusMessage) {
+                    contactStatusMessage.textContent = 'Please enter a valid email address.';
+                    contactStatusMessage.className = 'status-message error visible-message';
+                }
+                isValid = false;
+            }
+        }
+
+        if (!messageValue) {
+            contactMessage.classList.add('input-error');
+            isValid = false;
+        }
+
+        if (!isValid && contactStatusMessage && !contactStatusMessage.textContent) { 
+            contactStatusMessage.textContent = 'Please fill in all required fields.';
+            contactStatusMessage.className = 'status-message error visible-message';
+        }
+        
+        if (!isValid) return;
+
+        submitContact.disabled = true;
+        submitContact.textContent = 'Sending...';
+
+        try {
+            if (!state.supabaseClient) {
+                throw new Error("Submission service is currently unavailable.");
+            }
+
+            // Insert into Supabase
+            const { data, error } = await state.supabaseClient
+                .from('contact_requests')
+                .insert([
+                    { email: contactEmail.value.trim(), message: contactMessage.value.trim() }
+                ]);
+
+            if (error) {
+                throw new Error(error.message || 'Failed to send message. Please try again.');
+            }
+
+            // Success UI logic here (hide form, show thank you, etc.)
+            if (contactEmail) contactEmail.style.display = 'none';
+            if (contactMessage) contactMessage.style.display = 'none';
+            const buttonsContainer = document.querySelector('.contact-popup .popup-buttons');
+            if (buttonsContainer) buttonsContainer.style.display = 'none';
+
+            if (contactStatusMessage) {
+                contactStatusMessage.innerHTML = 'Message Sent! <span class="checkmark-icon">✓</span>';
+                contactStatusMessage.className = 'status-message success-sent visible-message';
+            }
+
+            setTimeout(() => {
+                if (contactStatusMessage) {
+                    contactStatusMessage.classList.remove('visible-message'); 
+                }
+                setTimeout(() => {
+                    closeContactForm(); 
+                }, 400); 
+            }, 3000); 
+            // --- End Success ---
+
+        } catch (submissionError) {
+            // Show error to user
+            if (contactStatusMessage) {
+                contactStatusMessage.textContent = submissionError.message || 'An unexpected error occurred. Please try again.';
+                contactStatusMessage.className = 'status-message error visible-message';
+            }
+            submitContact.disabled = false;
+            submitContact.textContent = 'Submit';
         }
     });
 }

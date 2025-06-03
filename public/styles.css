@@ -1012,3 +1012,228 @@ html, body {
   opacity: 0;
   transition: opacity 0.5s ease-in-out;
 }
+
+/* General Popup Overlay Style (can be shared with phonePopup if structure is similar) */
+.popup-overlay {
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  /* MODIFIED: Increased duration for opacity, adjusted visibility delay */
+  transition: opacity 0.6s ease, visibility 0s linear 0.6s;
+}
+
+.popup-overlay.visible {
+  opacity: 1;
+  visibility: visible;
+  /* MODIFIED: Increased duration for opacity, visibility becomes active immediately */
+  transition: opacity 0.6s ease, visibility 0s linear 0s;
+}
+
+/* Contact Popup Specifics */
+.contact-popup .popup-content {
+  background-color: #fff;
+  padding: 25px 30px;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  width: 90%;
+  max-width: 450px; /* Adjust as needed */
+  text-align: center;
+  position: relative; /* For absolute positioning of close button */
+  transform: scale(0.9);
+  /* MODIFIED: Increased duration for transform */
+  transition: transform 0.6s cubic-bezier(0.25, 0.8, 0.25, 1); /* Added a smoother easing function */
+}
+
+.popup-overlay.visible .popup-content {
+    transform: scale(1);
+}
+
+
+.contact-popup h3 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #333;
+  font-size: 1.5em;
+}
+
+.contact-popup input[type="email"],
+.contact-popup textarea {
+  width: calc(100% - 20px); /* Full width minus padding */
+  padding: 12px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1em;
+  box-sizing: border-box;
+  transition: border-color 0.3s ease;
+}
+
+.contact-popup input[type="email"]:focus,
+.contact-popup textarea:focus {
+  border-color: #007bff; /* Highlight on focus */
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0,123,255,.25);
+}
+
+.contact-popup textarea {
+  resize: vertical; /* Allow vertical resize */
+  min-height: 80px;
+}
+
+.contact-popup .input-error {
+  border-color: #dc3545 !important; /* Red border for errors */
+}
+
+.contact-popup .popup-buttons {
+  display: flex;
+  justify-content: space-between; /* Or center, or flex-end */
+  margin-top: 10px;
+}
+
+.contact-popup .popup-buttons button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.contact-popup .popup-buttons button#submitContact {
+  background-color: #007bff; /* Primary color */
+  color: white;
+  flex-grow: 1; /* Make submit button take more space if needed */
+  margin-right: 5px; /* Space from cancel */
+}
+.contact-popup .popup-buttons button#submitContact:hover {
+  background-color: #0056b3;
+}
+.contact-popup .popup-buttons button#submitContact:disabled {
+  background-color: #6c757d; /* Disabled color */
+  cursor: not-allowed;
+}
+
+.contact-popup .popup-buttons button#cancelContact {
+  background-color: #f8f9fa; /* Light grey */
+  color: #333;
+  border: 1px solid #ddd;
+  flex-grow: 1;
+  margin-left: 5px; /* Space from submit */
+}
+.contact-popup .popup-buttons button#cancelContact:hover {
+  background-color: #e2e6ea;
+}
+
+.close-popup-button {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 2em; /* Make it larger */
+  color: #888;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+}
+.close-popup-button:hover {
+  color: #333;
+}
+
+.status-message {
+  padding: 10px;
+  margin-bottom: 15px;
+  border-radius: 5px;
+  font-size: 0.9em;
+  text-align: left;
+  opacity: 0;
+  visibility: hidden;
+  max-height: 0; /* Initial state for when not visible */
+  overflow: hidden;
+  box-sizing: border-box;
+  /* MODIFIED: Removed max-height from direct transition here.
+     Opacity is primary for fade. Visibility handles display state. */
+  transition: opacity 0.4s ease, 
+              visibility 0s linear 0.4s; /* Visibility changes after opacity transition */
+}
+
+.status-message.success {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.status-message.error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.status-message.success-sent {
+  background-color: transparent;
+  border: none;
+  color: #007bff;
+  font-size: 1.4em;
+  font-weight: 500;
+  text-align: center;
+  padding: 20px 10px !important;
+  margin-top: 20px;
+  margin-bottom: 20px !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  /* Ensure it has enough height when visible, opacity will handle the fade */
+  /* max-height will be set by .visible-message */
+}
+
+.status-message.success-sent .checkmark-icon {
+  font-size: 2em;
+  color: #28a745;
+  margin-top: 10px;
+  display: inline-block;
+}
+
+.status-message.visible-message {
+  opacity: 1;
+  visibility: visible;
+  max-height: 150px; /* Set an appropriate max-height for when it's visible */
+                      /* This ensures space is allocated. */
+  /* MODIFIED: Removed max-height from direct transition here.
+     Opacity is primary for fade. Visibility handles display state. */
+  transition: opacity 0.4s ease,
+              visibility 0s linear 0s; /* Visibility changes immediately */
+}
+
+/* Ensure inputs and buttons hide smoothly if desired, or instantly */
+.contact-popup input[type="email"],
+.contact-popup textarea,
+.contact-popup .popup-buttons {
+  transition: opacity 0.3s ease, max-height 0.3s ease, padding 0.3s ease, margin 0.3s ease;
+  overflow: hidden; /* Important for max-height transition */
+}
+
+/* Style for when they are hidden by JS (display: none) */
+/* No specific style needed if JS sets display: none directly, 
+   but if you were to use a class for hiding:
+.form-element-hidden {
+  opacity: 0;
+  max-height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+  border-width: 0;
+  visibility: hidden;
+}
+*/
+

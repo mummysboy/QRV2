@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, viewport-fit=cover, user-scalable=no, maximum-scale=1.0">
   <title>QRewards</title>
   <meta name="description" content="Scan. Play. Win!">
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css" /> <!-- Ensure this path is correct -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
@@ -18,9 +18,7 @@
         <span></span>
       </button>
       <div class="menu-dropdown">
-        <a href="#" class="menu-item">Sign-in</a>
-        <a href="#" class="menu-item">Advertise</a>
-        <a href="#" class="menu-item">Contact</a>
+        <a href="#" id="contactMenuLink" class="menu-item">Contact</a> <!-- Added id -->
       </div>
     </div>
   </div>
@@ -63,31 +61,26 @@
       <input type="tel" id="phoneInput" placeholder="(123) 456-7890" maxlength="14">
       <p class="disclaimer-text">Message & data rates may apply</p>
       <p class="disclaimer-text">We value your privacy. Your information will not be sold to third parties.</p>
-      
-      <!-- Terms and Conditions Checkbox and Link -->
-      <div class="terms-container">
-        <input type="checkbox" id="termsCheckbox" name="termsCheckbox">
-        <label for="termsCheckbox">I agree to the <a href="terms.html" target="_blank" rel="noopener noreferrer" id="termsLinkAnchor">Terms and Conditions</a>.</label>
-      </div>
-
       <div class="popup-buttons">
-        <button id="submitPhone" disabled>Submit</button> <!-- Submit button is disabled by default -->
+        <button id="submitPhone">Submit</button>
         <button id="cancelPhone">Cancel</button>
       </div>
     </div>
   </div>
 
   <!-- Contact Popup -->
-  <div id="contactPopup" class="contact-popup hidden">
+  <div id="contactPopup" class="contact-popup popup-overlay hidden"> <!-- Added popup-overlay for consistency -->
     <div class="popup-content">
+      <button class="close-popup-button" id="closeContactPopup">&times;</button> <!-- Added close button -->
       <h3>We'd be happy to hear from you!</h3>
-      <input type="email" id="contactEmail" placeholder="Your email address" />
-      <textarea id="contactMessage" placeholder="Your message" rows="4"></textarea>
+      <div id="contactStatusMessage" class="status-message"></div> <!-- Added status message area -->
+      <input type="email" id="contactEmail" placeholder="Your email address" aria-label="Your email address" />
+      <textarea id="contactMessage" placeholder="Your message" rows="4" aria-label="Your message"></textarea>
       <div class="popup-buttons">
         <button id="submitContact">Submit</button>
         <button id="cancelContact">Cancel</button>
       </div>
-    </div> <!-- Closing for contactPopup's popup-content -->
+    </div>
   </div> <!-- Closing for contactPopup -->
 
   <!-- Post Submit Overlay -->
