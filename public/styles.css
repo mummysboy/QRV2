@@ -1237,3 +1237,33 @@ html, body {
 }
 */
 
+/* Shake animation for terms container */
+.terms-container.shake {
+  animation: shake 0.4s;
+}
+
+@keyframes shake {
+  0% { transform: translateX(0); }
+  20% { transform: translateX(-8px); }
+  40% { transform: translateX(8px); }
+  60% { transform: translateX(-8px); }
+  80% { transform: translateX(8px); }
+  100% { transform: translateX(0); }
+}
+
+#termsCheckbox.ring {
+  outline: 2px solid #007bff;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(0,123,255,0.2);
+  border-radius: 4px;
+  transition: outline 0.2s, box-shadow 0.2s;
+}
+
+.terms-notice {
+  color: #007bff;
+  font-size: 0.95em;
+  margin-top: 6px;
+  opacity: 1;
+  transition: opacity 0.3s;
+}
+

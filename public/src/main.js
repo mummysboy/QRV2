@@ -441,10 +441,14 @@ const phoneInput = document.getElementById('phoneInput');
 const submitPhone = document.getElementById('submitPhone');
 const cancelPhone = document.getElementById('cancelPhone');
 const termsCheckbox = document.getElementById('termsCheckbox');
-// const termsLink = document.getElementById('termsLink'); // This was for the span, no longer needed for modal JS
-// const termsModal = document.getElementById('termsModal'); // REMOVE
-// const closeTermsModal = document.getElementById('closeTermsModal'); // REMOVE
+const termsNotice = document.getElementById('termsNotice');
 
+if (termsCheckbox && submitPhone) {
+  termsCheckbox.addEventListener('change', () => {
+    submitPhone.disabled = !termsCheckbox.checked;
+    if (termsNotice) termsNotice.style.display = 'none';
+  });
+}
 
 if (phoneInput) {
     phoneInput.addEventListener('input', (e) => {
@@ -453,45 +457,23 @@ if (phoneInput) {
     });
 }
 
-// New: Terms and Conditions Modal Logic (REMOVE OR COMMENT OUT THIS ENTIRE BLOCK)
-/*
-if (termsLink && termsModal && closeTermsModal) {
-  termsLink.addEventListener('click', () => {
-    termsModal.classList.remove('hidden');
-    termsModal.classList.add('visible');
-  });
-
-  closeTermsModal.addEventListener('click', () => {
-    termsModal.classList.remove('visible');
-    termsModal.classList.add('hidden');
-  });
-
-  window.addEventListener('click', (event) => {
-    if (event.target === termsModal) {
-      termsModal.classList.remove('visible');
-      termsModal.classList.add('hidden');
-    }
-  });
-}
-*/
-
-// Enable/Disable submit button based on terms checkbox (KEEP THIS)
-if (termsCheckbox && submitPhone) {
-  termsCheckbox.addEventListener('change', () => {
-    submitPhone.disabled = !termsCheckbox.checked;
-    if (termsCheckbox.checked) {
-        submitPhone.classList.add('enabled');
-    } else {
-        submitPhone.classList.remove('enabled');
-    }
-  });
-}
-
-
 if (submitPhone) {
     submitPhone.addEventListener('click', async () => {
         if (termsCheckbox && !termsCheckbox.checked) {
-            alert('Please agree to the Terms and Conditions to proceed.');
+            // Show notice
+            if (termsNotice) termsNotice.style.display = 'block';
+            // Add shake and ring
+            const termsContainer = termsCheckbox.closest('.terms-container');
+            if (termsContainer) {
+                termsContainer.classList.add('shake');
+                setTimeout(() => termsContainer.classList.remove('shake'), 400);
+            }
+            termsCheckbox.classList.add('ring');
+            setTimeout(() => termsCheckbox.classList.remove('ring'), 1200);
+
+            // Optionally, focus the checkbox
+            termsCheckbox.focus();
+
             return; 
         }
 

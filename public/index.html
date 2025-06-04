@@ -61,8 +61,21 @@
       <input type="tel" id="phoneInput" placeholder="(123) 456-7890" maxlength="14">
       <p class="disclaimer-text">Message & data rates may apply</p>
       <p class="disclaimer-text">We value your privacy. Your information will not be sold to third parties.</p>
+      
+      <!-- Terms and Conditions Checkbox -->
+      <div class="terms-container">
+        <input type="checkbox" id="termsCheckbox" name="termsCheckbox">
+        <label for="termsCheckbox">
+          I agree to the
+          <a href="terms.html" target="_blank" rel="noopener noreferrer">Terms and Conditions</a>.
+        </label>
+        <div id="termsNotice" class="terms-notice" style="display:none;">
+          Please accept the Terms and Conditions to continue.
+        </div>
+      </div>
+
       <div class="popup-buttons">
-        <button id="submitPhone">Submit</button>
+        <button id="submitPhone" disabled>Submit</button>
         <button id="cancelPhone">Cancel</button>
       </div>
     </div>
