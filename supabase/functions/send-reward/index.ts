@@ -26,7 +26,22 @@ serve(async (req) => {
       from: "Isaac from QRewards <onboarding@resend.dev>",
       to: email,
       subject: "🎉 You’ve earned a reward!",
-      html: `<p>Congrats! <a href="${rewardLink}">Click here to claim your reward</a>.</p>`,
+      html: `<p>
+  🎉 <strong>Congratulations!</strong> You've successfully claimed a reward through QRewards.
+</p>
+<p>
+  👉 <a href="${rewardLink}">Click here to view your reward</a>
+</p>
+<p>
+  ✅ When you're ready to use it, simply show this page to the cashier or staff at checkout.
+</p>
+<p>
+  📅 <strong>Important:</strong> Be sure to check the expiration date listed on the reward and use it before it expires.
+</p>
+<p>
+  🙏 Thanks for participating, and enjoy your reward!
+</p>
+`,
     });
 
     console.log("Resend email send result:", data);
