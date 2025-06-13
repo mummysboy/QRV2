@@ -115,9 +115,26 @@
     </div>
   </div>
 
-
+  <!-- Use Reward Popup -->
+  <div id="useRewardPopup" class="popup hidden">
+    <div class="popup-content">
+      <div id="useRewardMessage">Are you sure you want to use this reward?</div>
+      <div class="popup-buttons">
+        <button id="useRewardYes">Yes</button>
+        <button id="useRewardNo">No</button>
+      </div>
+    </div>
+  </div>
 
   <script type="module" src="src/config.js"></script>
   <script type="module" src="src/main.js" defer></script>
+
+  <style>
+    .popup { position: fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:9999; }
+    .popup.hidden { display: none; }
+    .popup-content { background: #fff; padding: 2em; border-radius: 10px; text-align: center; min-width: 250px; }
+    .popup-buttons { margin-top: 1em; }
+    .popup-buttons button { margin: 0 0.5em; }
+  </style>
 </body>
 </html>

@@ -301,8 +301,9 @@ async function populateOverlayWithData() {
     }
     state.currentCardId = reward.cardid;
     if (claimBtn) {
-      claimBtn.textContent = "Reward Claimed";
-      claimBtn.disabled = true;
+      claimBtn.textContent = "Use Reward";
+      claimBtn.disabled = false;
+      claimBtn.onclick = () => showUseRewardPopup(claimId); // Attach handler
     }
   } else {
     // Default: random card logic
@@ -317,8 +318,7 @@ async function populateOverlayWithData() {
       reward = await getRandomCardFromSupabase();
     }
     if (claimBtn) {
-      claimBtn.textContent = "Claim Reward";
-      claimBtn.disabled = false;
+      claimBtn.onclick = null; // Remove handler for non-claimed view
     }
   }
 
@@ -1108,4 +1108,43 @@ async function getClaimedRewardData(claimId) {
     console.error("Error fetching claimed reward:", e);
     return null;
   }
+}
+
+function showUseRewardPopup(claimId) {
+  const popup = document.getElementById('useRewardPopup');
+  const message = document.getElementById('useRewardMessage');
+  const yesBtn = document.getElementById('useRewardYes');
+  const noBtn = document.getElementById('useRewardNo');
+
+  if (!popup || !yesBtn || !noBtn) return;
+
+  popup.classList.remove('hidden');
+  message.textContent = "Are you sure you want to use this reward?";
+
+  // Remove previous listeners
+  yesBtn.onclick = null;
+  noBtn.onclick = null;
+
+  yesBtn.onclick = async () => {
+    message.textContent = "Thank you for using the reward!";
+    yesBtn.style.display = "none";
+    noBtn.style.display = "none";
+    // Delete the row from Supabase
+    if (state.supabaseClient && claimId) {
+      await state.supabaseClient
+        .from("claimed_rewards")
+        .delete()
+        .eq("claim_id", claimId);
+    }
+    setTimeout(() => {
+      popup.classList.add('hidden');
+      yesBtn.style.display = "";
+      noBtn.style.display = "";
+      // Optionally, you can also refresh the page or update UI here
+    }, 1800);
+  };
+
+  noBtn.onclick = () => {
+    popup.classList.add('hidden');
+  };
 }
