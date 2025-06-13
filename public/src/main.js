@@ -573,8 +573,11 @@ if (submitEmail) {
             try {
                 await fetch('https://luaopykuvzodhgxuthoc.functions.supabase.co/send-reward', {
                   method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ email: emailValue }),
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${CONFIG.supabaseAnonKey}`
+                  },
+                  body: JSON.stringify({ email: emailValue, claimId }), // <-- Pass claimId
                 });
                 alert('Reward sent!');
             } catch (err) {
@@ -1095,7 +1098,7 @@ async function getClaimedRewardData(claimId) {
       .from("claimed_rewards")
       .select("*")
       .eq("claim_id", claimId)
-      .single();
+      .single(); // 🔁 if only one result is expected
     if (error || !data) {
       console.warn("Claimed reward not found for claim_id:", claimId);
       return null;

@@ -19,8 +19,8 @@ serve(async (req) => {
   }
 
   try {
-    const { email } = await req.json();
-    const rewardLink = "https://yourdomain.com/reward?id=abc123"; // Replace or generate dynamically
+    const { email, claimId } = await req.json();
+    const rewardLink = `https://qrewards.netlify.app/id=${claimId}`;
 
     const data = await resend.emails.send({
       from: "Isaac from QRewards <onboarding@resend.dev>",
@@ -28,6 +28,8 @@ serve(async (req) => {
       subject: "🎉 You’ve earned a reward!",
       html: `<p>Congrats! <a href="${rewardLink}">Click here to claim your reward</a>.</p>`,
     });
+
+    console.log("Resend email send result:", data);
 
     return new Response(
       JSON.stringify({ success: true, message: "Email sent", data }),
