@@ -5,7 +5,19 @@ import { Resend } from "npm:resend";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
+function corsHeaders() {
+  return {
+    "Access-Control-Allow-Origin": "*", // Or specify your domain instead of *
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+    "Access-Control-Allow-Methods": "POST, OPTIONS"
+  };
+}
+
 serve(async (req) => {
+  if (req.method === "OPTIONS") {
+    return new Response("ok", { headers: corsHeaders() });
+  }
+
   try {
     const { email } = await req.json();
     const rewardLink = "https://yourdomain.com/reward?id=abc123"; // Replace or generate dynamically
@@ -19,7 +31,7 @@ serve(async (req) => {
 
     return new Response(
       JSON.stringify({ success: true, message: "Email sent", data }),
-      { status: 200 }
+      { status: 200, headers: corsHeaders() }
     );
   } catch (err) {
     console.error("Failed to send email", err);
@@ -27,6 +39,7 @@ serve(async (req) => {
       JSON.stringify({ success: false, error: err.message }),
       {
         status: 500,
+        headers: corsHeaders(),
       }
     );
   }
