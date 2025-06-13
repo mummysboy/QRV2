@@ -382,14 +382,14 @@ if (claimBtn) {
         if (claimBtn.textContent === "Try Again") {
             location.reload(); // Reload the page
         } else if (claimBtn.textContent === "Claim Reward") {
-            // Original logic to open phone popup
-            const phonePopup = document.getElementById('phonePopup');
-            if (phonePopup) {
-                phonePopup.classList.remove('hidden');
-                phonePopup.classList.add('visible');
-                const phoneInput = document.getElementById('phoneInput');
-                if (phoneInput) {
-                    phoneInput.focus();
+            // Open email popup instead of phone popup
+            const emailPopup = document.getElementById('emailPopup');
+            if (emailPopup) {
+                emailPopup.classList.remove('hidden');
+                emailPopup.classList.add('visible');
+                const emailInput = document.getElementById('emailInput');
+                if (emailInput) {
+                    emailInput.focus();
                 }
             }
         }
@@ -436,29 +436,22 @@ function updatePlayAgainTimer() {
 }
 
 
-const phonePopup = document.getElementById('phonePopup');
-const phoneInput = document.getElementById('phoneInput');
-const submitPhone = document.getElementById('submitPhone');
-const cancelPhone = document.getElementById('cancelPhone');
+const emailPopup = document.getElementById('emailPopup');
+const emailInput = document.getElementById('emailInput');
+const submitEmail = document.getElementById('submitEmail');
+const cancelEmail = document.getElementById('cancelEmail');
 const termsCheckbox = document.getElementById('termsCheckbox');
 const termsNotice = document.getElementById('termsNotice');
 
-if (termsCheckbox && submitPhone) {
+if (termsCheckbox && submitEmail) {
   termsCheckbox.addEventListener('change', () => {
-    submitPhone.disabled = !termsCheckbox.checked;
+    submitEmail.disabled = !termsCheckbox.checked;
     if (termsNotice) termsNotice.style.display = 'none';
   });
 }
 
-if (phoneInput) {
-    phoneInput.addEventListener('input', (e) => {
-        let x = e.target.value.replace(/\D/g, '').match(/(\d{0,3})(\d{0,3})(\d{0,4})/);
-        e.target.value = !x[2] ? x[1] : '(' + x[1] + ') ' + x[2] + (x[3] ? '-' + x[3] : '');
-    });
-}
-
-if (submitPhone) {
-    submitPhone.addEventListener('click', async () => {
+if (submitEmail) {
+    submitEmail.addEventListener('click', async () => {
         if (termsCheckbox && !termsCheckbox.checked) {
             // Show notice
             if (termsNotice) termsNotice.style.display = 'block';
@@ -471,19 +464,20 @@ if (submitPhone) {
             termsCheckbox.classList.add('ring');
             setTimeout(() => termsCheckbox.classList.remove('ring'), 1200);
 
-            // Optionally, focus the checkbox
             termsCheckbox.focus();
-
             return; 
         }
 
-        const rawPhoneNumber = phoneInput.value.replace(/\D/g, '');
+        const emailValue = emailInput.value.trim();
 
-        if (rawPhoneNumber.length === 10 && state.currentCardId && state.supabaseClient) {
-            const formattedPhoneNumber = '+1' + rawPhoneNumber; // Add +1 prefix
-            console.log('Raw phone number submitted:', rawPhoneNumber, 'Formatted:', formattedPhoneNumber, 'for cardId:', state.currentCardId);
+        if (!validateEmail(emailValue)) {
+            alert('Please enter a valid email address.');
+            emailInput.focus();
+            return;
+        }
 
-            // --- DECREMENT QUANTITY LOGIC ---
+        // --- DECREMENT QUANTITY LOGIC ---
+        if (state.currentCardId && state.supabaseClient) {
             try {
                 const { data: currentCard, error: fetchError } = await state.supabaseClient
                     .from('cards')
@@ -498,11 +492,10 @@ if (submitPhone) {
                 }
 
                 if (!currentCard || currentCard.quantity <= 0) {
-                    console.log(`Card ${state.currentCardId} is out of stock or not found.`);
                     alert('Sorry, this reward is no longer available.');
-                    if (phonePopup) {
-                        phonePopup.classList.remove('visible');
-                        phonePopup.classList.add('hidden');
+                    if (emailPopup) {
+                        emailPopup.classList.remove('visible');
+                        emailPopup.classList.add('hidden');
                     }
                     return;
                 }
@@ -514,18 +507,14 @@ if (submitPhone) {
                     .eq('cardid', state.currentCardId);
 
                 if (updateError) {
-                    console.error('Error decrementing card quantity:', updateError);
                     alert('There was an issue claiming the reward. Please try again.');
                     return;
                 }
-                console.log(`Card ${state.currentCardId} quantity decremented to ${newQuantity}.`);
 
             } catch (e) {
-                console.error("Exception during quantity decrement process:", e);
                 alert('An unexpected error occurred while claiming. Please try again.');
                 return;
             }
-            // --- END DECREMENT QUANTITY LOGIC ---
 
             // --- NEW CLAIM RECORD ---
             const claimId = generateClaimId(16);
@@ -537,16 +526,27 @@ if (submitPhone) {
                     .eq('cardid', state.currentCardId)
                     .single();
                 if (error || !data) {
-                    console.error('Failed to fetch full card data for claim record:', error);
                     alert('Something went wrong retrieving reward details for saving. Please try again.');
                     return;
                 }
                 cardDataForClaim = data;
             } catch (e) {
-                console.error("Exception fetching full card data for claim:", e);
                 alert('An unexpected error occurred. Please try again.');
                 return;
             }
+
+            console.log('Insert object:', {
+              claim_id:    claimId,
+              cardid:      cardDataForClaim.cardid,
+              header:      cardDataForClaim.header,
+              addresstext: cardDataForClaim.addresstext,
+              addressurl:  cardDataForClaim.addressurl,
+              logokey:     cardDataForClaim.logokey,
+              subheader:   cardDataForClaim.subheader,
+              expires:     cardDataForClaim.expires,
+              email:       emailValue,
+              claimed_at:  new Date().toISOString()
+            });
 
             const { error: insertError } = await state.supabaseClient
                 .from('claimed_rewards')
@@ -559,123 +559,77 @@ if (submitPhone) {
                     logokey:     cardDataForClaim.logokey,
                     subheader:   cardDataForClaim.subheader,
                     expires:     cardDataForClaim.expires,
-                    phone:       formattedPhoneNumber, // Use formattedPhoneNumber
+                    email:       emailValue,
                     claimed_at:  new Date().toISOString()
                 });
 
             if (insertError) {
-                console.error('Failed to save claim-record:', insertError);
-                alert('Failed to save your claim. Please try again. If the problem persists, contact support.');
-                return;
+              console.error('Supabase insert error:', insertError);
+              alert('Failed to save your claim. Please try again. If the problem persists, contact support.');
+              return;
             }
-            console.log('Claim record saved:', claimId);
 
-            // --- SEND SMS ---
-            fetch('/.netlify/functions/send-sms', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                to:       formattedPhoneNumber,  // Use formattedPhoneNumber
-                claimId:  claimId
-              })
-            })
-            .then(r => {
-              if (!r.ok) {
-                // Try to get more details from the response if possible
-                return r.text().then(text => {
-                    throw new Error(`SMS failed: ${r.status} ${r.statusText} - ${text}`);
+            // --- SEND EMAIL REWARD ---
+            try {
+                await fetch('https://luaopykuvzodhgxuthoc.functions.supabase.co/send-reward', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ email: emailValue }),
                 });
-              }
-              console.log('Verification SMS sent!');
-              return r.json(); // Or r.text() if your function doesn't return JSON
-            })
-            .then(data => {
-                if (data) console.log('SMS function response:', data);
-            })
-            .catch(err => {
-              console.error('Error sending SMS:', err);
-              // It's important not to block the UI transition if SMS fails,
-              // but the user should be informed if critical.
-              // For now, we just log it, as the primary claim is saved.
-              // You might want to add a non-blocking notification later.
-              // alert('Couldn’t send SMS—please try again in a moment.'); // Optional: inform user
-            });
-            // --- END SEND SMS ---
-
-            // --- END NEW CLAIM RECORD ---
+                alert('Reward sent!');
+            } catch (err) {
+                alert(err.message || 'An error occurred sending the reward email.');
+            }
 
             // --- UI TRANSITION ---
-            // Hide phone popup
-            if (phonePopup) {
-                phonePopup.classList.remove('visible');
-                phonePopup.classList.add('hidden');
-                if (phoneInput) phoneInput.value = ''; // Clear input
+            if (emailPopup) {
+                emailPopup.classList.remove('visible');
+                emailPopup.classList.add('hidden');
+                if (emailInput) emailInput.value = ''; // Clear input
             }
-
-            // Hide the main card overlay (overlayEl) explicitly
-            // This ensures it's gone before the new screen elements appear.
             if (overlayEl) {
-                overlayEl.classList.remove('visible'); // Remove any visibility class
-                overlayEl.classList.add('hidden');   // Add class to make it display: none
+                overlayEl.classList.remove('visible');
+                overlayEl.classList.add('hidden');
             }
-
-            // Fade out main content (slideshow-container)
-            if (container) { // container is slideshow-container
-                container.classList.add('faded-out'); // Assumes CSS handles the fade
+            if (container) {
+                container.classList.add('faded-out');
             }
-            // Optionally hide the claim button
             if (claimBtn) {
                 claimBtn.classList.add('hidden');
             }
-
-            // Make the logoAnimation video visible and play it
             if (logoVideo) {
-                logoVideo.style.display = 'block'; // Or 'flex', or remove a .hidden class
-                // If logoVideo needs to fade in, ensure its CSS has a transition for opacity.
-                // The following lines will make it appear instantly or animate via CSS.
-                void logoVideo.offsetWidth; // Force reflow if CSS transition for opacity exists
+                logoVideo.style.display = 'block';
+                void logoVideo.offsetWidth;
                 logoVideo.style.opacity = '1';
-                logoVideo.currentTime = 0; // Rewind to the beginning
+                logoVideo.currentTime = 0;
                 logoVideo.play().catch(error => console.error("Error playing logo video:", error));
             }
-
-            // Show the post-submit overlay with message and timer
             if (postSubmitOverlayEl) {
-                postSubmitOverlayEl.classList.remove('hidden'); // Make it displayable
-                void postSubmitOverlayEl.offsetWidth; // Force reflow
-                postSubmitOverlayEl.classList.add('visible'); // This should trigger CSS fade-in
+                postSubmitOverlayEl.classList.remove('hidden');
+                void postSubmitOverlayEl.offsetWidth;
+                postSubmitOverlayEl.classList.add('visible');
                 startPlayAgainTimer();
             }
-            // --- END UI TRANSITION ---
-
-        } else if (rawPhoneNumber.length !== 10) {
-            alert('Please enter a valid 10-digit phone number.');
         } else {
-            // This handles cases where currentCardId or supabaseClient might be missing
             alert('Cannot process claim at this moment. Please ensure a reward is displayed and try again.');
-            console.warn('SubmitPhone pre-check failed:', {
-                phoneNumberLength: rawPhoneNumber.length,
-                currentCardId: state.currentCardId,
-                supabaseClientReady: !!state.supabaseClient
-            });
         }
     });
 }
 
-if (cancelPhone && phonePopup && phoneInput) {
-    cancelPhone.addEventListener('click', () => {
-        phonePopup.classList.remove('visible');
-        phonePopup.classList.add('hidden');
-        phoneInput.value = '';
+if (cancelEmail && emailPopup && emailInput) {
+    cancelEmail.addEventListener('click', () => {
+        emailPopup.classList.remove('visible');
+        emailPopup.classList.add('hidden');
+        emailInput.value = '';
     });
 }
 
-if (phonePopup && phoneInput) {
-    phonePopup.addEventListener('click', (e) => {
-        if (e.target === phonePopup) {
-            phonePopup.classList.remove('visible');
-            phonePopup.classList.add('hidden');
-            phoneInput.value = '';
+if (emailPopup && emailInput) {
+    emailPopup.addEventListener('click', (e) => {
+        if (e.target === emailPopup) {
+            emailPopup.classList.remove('visible');
+            emailPopup.classList.add('hidden');
+            emailInput.value = '';
         }
     });
 }

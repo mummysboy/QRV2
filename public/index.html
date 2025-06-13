@@ -53,13 +53,11 @@
     <!-- 3) Claim button (must be *inside* the relative container) -->
     <button id="claimBtn" class="hidden">Claim Reward</button>
   </div>
-
-  <!-- Phone Popup -->
-  <div id="phonePopup" class="phone-popup hidden">
+  <!-- Email Popup -->
+  <div id="emailPopup" class="email-popup popup-overlay hidden">
     <div class="popup-content">
-      <h3>Enter Phone Number</h3>
-      <input type="tel" id="phoneInput" placeholder="(123) 456-7890" maxlength="14">
-      <p class="disclaimer-text">Message & data rates may apply</p>
+      <h3>Enter Email Address</h3>
+      <input type="email" id="emailInput" placeholder="you@example.com" maxlength="254" autocomplete="email">
       <p class="disclaimer-text">We value your privacy. Your information will not be sold to third parties.</p>
       
       <!-- Terms and Conditions Checkbox -->
@@ -75,8 +73,8 @@
       </div>
 
       <div class="popup-buttons">
-        <button id="submitPhone" disabled>Submit</button>
-        <button id="cancelPhone">Cancel</button>
+        <button id="submitEmail" disabled>Submit</button>
+        <button id="cancelEmail">Cancel</button>
       </div>
     </div>
   </div>
@@ -116,6 +114,8 @@
       </svg>
     </div>
   </div>
+
+
 
   <script type="module" src="src/config.js"></script>
   <script type="module" src="src/main.js" defer></script>

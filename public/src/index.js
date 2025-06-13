@@ -37,3 +37,28 @@ import { Animator } from "./animator.js";
   });
   animator.start();
 })();
+
+document.getElementById('rewardForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const email = document.getElementById('email').value;
+  const btn = document.getElementById('claimBtn');
+  btn.disabled = true;
+  btn.textContent = 'Sending...';
+
+  try {
+    const res = await fetch('https://luaopykuvzodhgxuthoc.functions.supabase.co/send-reward', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    });
+
+    const result = await res.json();
+    if (!res.ok) throw new Error(result.error || 'Failed to send reward.');
+    alert(result.message || 'Reward sent!');
+  } catch (err) {
+    alert(err.message || 'An error occurred.');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Claim Reward';
+  }
+});
