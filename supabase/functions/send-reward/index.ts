@@ -7,7 +7,7 @@ const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
 function corsHeaders() {
   return {
-    "Access-Control-Allow-Origin": "*", // Or specify your domain instead of *
+    "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
     "Access-Control-Allow-Methods": "POST, OPTIONS"
   };
@@ -37,44 +37,8 @@ serve(async (req) => {
     console.error("Failed to send email", err);
     return new Response(
       JSON.stringify({ success: false, error: err.message }),
-      {
-        status: 500,
-        headers: corsHeaders(),
-      }
+      { status: 500, headers: corsHeaders() }
     );
   }
 });
 
-// Client-side code (to be used in your frontend JavaScript)
-// Replace 'email' with the actual email variable from your form/input
-<form id="rewardForm">
-  <input type="email" id="email" placeholder="Enter your email" required />
-  <button type="submit" id="claimBtn">Claim Reward</button>
-</form>
-
-<script>
-  document.getElementById('rewardForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const email = document.getElementById('email').value;
-    const btn = document.getElementById('claimBtn');
-    btn.disabled = true;
-    btn.textContent = 'Sending...';
-
-    try {
-      const res = await fetch('https://luaopykuvzodhgxuthoc.functions.supabase.co/send-reward', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-      });
-
-      const result = await res.json();
-      if (!res.ok) throw new Error(result.error || 'Failed to send reward.');
-      alert(result.message || 'Reward sent!');
-    } catch (err) {
-      alert(err.message || 'An error occurred.');
-    } finally {
-      btn.disabled = false;
-      btn.textContent = 'Claim Reward';
-    }
-  });
-</script>
